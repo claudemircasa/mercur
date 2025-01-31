@@ -70,12 +70,8 @@ yarn medusa db:create && yarn medusa db:migrate && yarn run seed
 cd ../..
 
 # Generate OpenAPI client
+yarn generate:oas
 yarn codegen
-
-# Build
-yarn build
-
-# Start Mercur
 yarn dev
 ```
 

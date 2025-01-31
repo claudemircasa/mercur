@@ -128,6 +128,107 @@ export interface AdminApplicationMethod {
   apply_to_quantity?: number;
 }
 
+/** The details of an inventory level to create. */
+export interface AdminBatchCreateInventoryItemsLocationLevels {
+  /**
+   * location_id
+   * The ID of the associated stock location.
+   */
+  location_id: string;
+  /**
+   * inventory_item_id
+   * The ID of the associated inventory item.
+   */
+  inventory_item_id: string;
+  /**
+   * stocked_quantity
+   * The stocked quantity.
+   */
+  stocked_quantity?: number;
+  /**
+   * incoming_quantity
+   * The incoming quantity to be added to stock.
+   */
+  incoming_quantity?: number;
+}
+
+/** The inventory levels to create, update, or delete. */
+export interface AdminBatchInventoryItemLocationsLevel {
+  /** The inventory levels to create. */
+  create?: {
+    /**
+     * location_id
+     * The ID of the associated location.
+     */
+    location_id: string;
+    /**
+     * stocked_quantity
+     * The inventory level's stocked quantity.
+     */
+    stocked_quantity?: number;
+    /**
+     * incoming_quantity
+     * The inventory level's incoming quantity.
+     */
+    incoming_quantity?: number;
+  }[];
+  /** The inventory levels to update. */
+  update?: {
+    /**
+     * stocked_quantity
+     * The inventory level's stocked quantity.
+     */
+    stocked_quantity?: number;
+    /**
+     * incoming_quantity
+     * The inventory level's incoming quantity.
+     */
+    incoming_quantity?: number;
+    /**
+     * location_id
+     * The associated stock location's ID.
+     */
+    location_id: string;
+    /**
+     * id
+     * The ID of the location level.
+     */
+    id?: string;
+  }[];
+  /** The inventory levels to delete. */
+  delete?: string[];
+  /**
+   * force
+   * Whether to delete specified inventory levels even if they have a non-zero stocked quantity.
+   */
+  force?: boolean;
+}
+
+/** The inventory levels to manage. */
+export interface AdminBatchInventoryItemsLocationLevels {
+  /** The inventory levels to create. */
+  create: AdminBatchCreateInventoryItemsLocationLevels[];
+  /** The inventory levels to update. */
+  update: AdminBatchUpdateInventoryItemsLocationLevels[];
+  /** The IDs of the inventory levels to delete. */
+  delete: string[];
+  /**
+   * force
+   * Whether to delete specified inventory levels even if they have a non-zero stocked quantity.
+   */
+  force?: boolean;
+}
+
+/** The result of managing inventory levels. */
+export interface AdminBatchInventoryItemsLocationLevelsResponse {
+  /** The created inventory levels. */
+  created?: InventoryLevel[];
+  /** The updated inventory levels. */
+  updated?: InventoryLevel[];
+  /** The IDs of deleted inventory levels. */
+  deleted?: string[];
+}
+
 /** The products to create, update, or delete. */
 export interface AdminBatchProductRequest {
   /** The products to create. */
@@ -194,6 +295,35 @@ export interface AdminBatchProductVariantResponse {
      */
     deleted: boolean;
   };
+}
+
+/** The details of an inventory level to update. */
+export interface AdminBatchUpdateInventoryItemsLocationLevels {
+  /**
+   * location_id
+   * The ID of the associated stock location.
+   */
+  location_id: string;
+  /**
+   * inventory_item_id
+   * The ID of the associated inventory item.
+   */
+  inventory_item_id: string;
+  /**
+   * stocked_quantity
+   * The stocked quantity.
+   */
+  stocked_quantity?: number;
+  /**
+   * incoming_quantity
+   * The incoming quantity to be added to stock.
+   */
+  incoming_quantity?: number;
+  /**
+   * id
+   * The update's ID.
+   */
+  id?: string;
 }
 
 /** The product's details. */
@@ -3244,7 +3374,7 @@ export interface AdminImportProductResponse {
   };
 }
 
-/** The reservation's inventory item. */
+/** The inventory item's details. */
 export interface AdminInventoryItem {
   /**
    * id
@@ -3263,17 +3393,17 @@ export interface AdminInventoryItem {
   origin_country?: string;
   /**
    * hs_code
-   * The inventory item's hs code.
+   * The inventory item's HS code.
    */
   hs_code?: string;
   /**
    * requires_shipping
-   * The inventory item's requires shipping.
+   * Whether the inventory item requires shipping.
    */
   requires_shipping: boolean;
   /**
    * mid_code
-   * The inventory item's mid code.
+   * The inventory item's MID code.
    */
   mid_code?: string;
   /**
@@ -3313,10 +3443,10 @@ export interface AdminInventoryItem {
   description?: string;
   /**
    * thumbnail
-   * The inventory item's thumbnail.
+   * The thumbnail URL of the inventory item.
    */
   thumbnail?: string;
-  /** The inventory item's metadata. */
+  /** Custom key-value pairs, used to store additional information about the inventory item. */
   metadata?: object;
   /** The inventory item's location levels. */
   location_levels?: AdminInventoryLevel[];
@@ -3324,7 +3454,7 @@ export interface AdminInventoryItem {
 
 /** The inventory item's details. */
 export interface AdminInventoryItemResponse {
-  /** The reservation's inventory item. */
+  /** The inventory item's details. */
   inventory_item: AdminInventoryItem;
 }
 
@@ -5013,26 +5143,6 @@ export interface AdminPayment {
    * The ID of the payment provider used to process this payment.
    */
   provider_id: string;
-  /**
-   * cart_id
-   * The ID of the associated cart.
-   */
-  cart_id?: string;
-  /**
-   * order_id
-   * The ID of the associated order.
-   */
-  order_id?: string;
-  /**
-   * order_edit_id
-   * The ID of the associated order edit.
-   */
-  order_edit_id?: string;
-  /**
-   * customer_id
-   * ID of the associated customer.
-   */
-  customer_id?: string;
   /** The payment's data, useful for processing by the payment provider. */
   data?: object;
   /**
@@ -5090,11 +5200,6 @@ export interface AdminPaymentCollection {
    * The payment collection's currency code.
    */
   currency_code: string;
-  /**
-   * region_id
-   * The ID of the region this payment collection is associated with.
-   */
-  region_id: string;
   /**
    * amount
    * The total amount to be paid.
@@ -6987,6 +7092,8 @@ export interface AdminProductVariant {
   deleted_at: string;
   /** The variant's metadata, can hold custom key-value pairs. */
   metadata?: object;
+  /** The variant's inventory items. */
+  inventory_items?: AdminProductVariantInventoryItemLink[];
 }
 
 /** The details of the product variant's deletion. */
@@ -7076,6 +7183,28 @@ export interface AdminProductVariantInventoryBatchResponse {
           inventory_item_id: string;
         };
       }[];
+}
+
+/** An association between a product variant and an inventory item. */
+export interface AdminProductVariantInventoryItemLink {
+  /**
+   * id
+   * The ID of the association.
+   */
+  id: string;
+  /**
+   * variant_id
+   * The associated product variant's ID.
+   */
+  variant_id: string;
+  variant?: object;
+  /**
+   * inventory_item_id
+   * The associated inventory item's ID.
+   */
+  inventory_item_id: string;
+  /** The inventory item's details. */
+  inventory?: AdminInventoryItem;
 }
 
 /** The details of an association between a product variant and an inventory item. */
@@ -7172,6 +7301,8 @@ export interface AdminPromotion {
    * @format date-time
    */
   deleted_at: string;
+  /** The promotion's status. */
+  status?: "draft" | "active" | "inactive";
 }
 
 /** The promotion's details. */
@@ -7402,7 +7533,7 @@ export interface AdminReservation {
    * The ID of the inventory item this reservation is associated with.
    */
   inventory_item_id: string;
-  /** The reservation's inventory item. */
+  /** The inventory item's details. */
   inventory_item?: AdminInventoryItem;
   /** The reservation's metadata, can hold custom key-value pairs. */
   metadata?: object;
@@ -8062,12 +8193,8 @@ export interface AdminShippingOptionRule {
    * @example "is_return"
    */
   attribute: string;
-  /**
-   * operator
-   * The shipping option rule's operator.
-   * @example "eq"
-   */
-  operator: string;
+  /** The rule's operator. */
+  operator: "gt" | "lt" | "eq" | "ne" | "in" | "lte" | "gte" | "nin";
   /** value */
   value: string;
   /**
@@ -11755,26 +11882,6 @@ export interface BasePayment {
    * The ID of the payment provider used to process this payment.
    */
   provider_id: string;
-  /**
-   * cart_id
-   * The ID of the associated cart.
-   */
-  cart_id?: string;
-  /**
-   * order_id
-   * The ID of the associated order.
-   */
-  order_id?: string;
-  /**
-   * order_edit_id
-   * The ID of the associated order edit.
-   */
-  order_edit_id?: string;
-  /**
-   * customer_id
-   * ID of the associated customer.
-   */
-  customer_id?: string;
   /** The payment's data, useful for processing by the payment provider. */
   data?: object;
   /**
@@ -11831,11 +11938,6 @@ export interface BasePaymentCollection {
    * The payment collection's currency code.
    */
   currency_code: string;
-  /**
-   * region_id
-   * The ID of the region this payment collection is associated with.
-   */
-  region_id: string;
   /**
    * amount
    * The total amount to be paid.
@@ -21636,11 +21738,6 @@ export interface StorePaymentCollection {
    */
   currency_code: string;
   /**
-   * region_id
-   * The ID of the region this payment collection is associated with.
-   */
-  region_id: string;
-  /**
    * amount
    * The total amount to be paid.
    */
@@ -21805,7 +21902,8 @@ export interface StorePriceRule {
 export interface StoreProduct {
   /** The product's categories. */
   categories?: object[];
-  type?: object;
+  /** The product type's details. */
+  type?: StoreProductType;
   /**
    * length
    * The product's length.
@@ -22180,6 +22278,94 @@ export interface StoreProductTag {
   deleted_at?: string;
   /** The tag's metadata, can hold custom key-value pairs. */
   metadata?: object;
+}
+
+/** The paginated list of product tags. */
+export interface StoreProductTagListResponse {
+  /**
+   * limit
+   * The maximum number of items returned.
+   */
+  limit: number;
+  /**
+   * offset
+   * The number of items to skip before retrieving the returned items.
+   */
+  offset: number;
+  /**
+   * count
+   * The total number of items available.
+   */
+  count: number;
+  /** The list of product tags. */
+  product_tags: StoreProductTag[];
+}
+
+/** The product tag's details. */
+export interface StoreProductTagResponse {
+  /** The tag's details. */
+  product_tag: StoreProductTag;
+}
+
+/** The product type's details. */
+export interface StoreProductType {
+  /**
+   * id
+   * The product type's ID.
+   */
+  id: string;
+  /** The product type's metadata, can hold custom key-value pairs. */
+  metadata?: object;
+  /**
+   * created_at
+   * The date the product type was created.
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * updated_at
+   * The date the product type was updated.
+   * @format date-time
+   */
+  updated_at: string;
+  /**
+   * deleted_at
+   * The date the product type was deleted.
+   * @format date-time
+   */
+  deleted_at?: string;
+  /**
+   * value
+   * The type's value.
+   */
+  value: string;
+}
+
+/** The paginated list of product types. */
+export interface StoreProductTypeListResponse {
+  /**
+   * limit
+   * The maximum number of items returned.
+   */
+  limit: number;
+  /**
+   * offset
+   * The number of items to skip before retrieving the returned items.
+   */
+  offset: number;
+  /**
+   * count
+   * The total number of items available.
+   */
+  count: number;
+  /** The list of product types. */
+  product_types: StoreProductType[];
+}
+
+/** The product type's details. */
+export interface StoreProductTypeResponse {
+  /** The product type's details. */
+  product_type: StoreProductType;
 }
 
 /** The variant's details. */
@@ -31865,20 +32051,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Add a Customer Group to a customer
+     * @description Manage the customer groups of a customer, adding or removing the customer from those groups.
      *
      * @tags Admin Customers
      * @name AdminPostCustomersIdCustomerGroups
-     * @summary Add Customer Group to Customer
+     * @summary Manage Customer Groups of Customer
      * @request POST:/admin/customers/{id}/customer-groups
      * @secure
      */
     adminPostCustomersIdCustomerGroups: (
       id: string,
       data: {
-        /** The customer's add. */
+        /** The customer groups to add the customer to. */
         add?: string[];
-        /** The customer's remove. */
+        /** The customer groups to remove the customer from. */
         remove?: string[];
       },
       query?: {
@@ -34797,6 +34983,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
+     * @description Manage inventory levels to create, update, or delete them.
+     *
+     * @tags Admin Inventory Items
+     * @name AdminPostInventoryItemsLocationLevelsBatch
+     * @summary Manage Inventory Levels
+     * @request POST:/admin/inventory-items/location-levels/batch
+     * @secure
+     */
+    adminPostInventoryItemsLocationLevelsBatch: (
+      data: AdminBatchInventoryItemsLocationLevels,
+      params: RequestParams = {},
+    ) =>
+      this.request<AdminBatchInventoryItemsLocationLevelsResponse, Error | string>({
+        path: `/admin/inventory-items/location-levels/batch`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Retrieve a inventory item by its ID. You can expand the inventory item's relations or select the fields that should be returned.
      *
      * @tags Admin Inventory Items
@@ -35098,56 +35307,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      */
     adminPostInventoryItemsIdLocationLevelsBatch: (
       id: string,
-      data: {
-        /** The inventory levels to create. */
-        create?: {
-          /**
-           * location_id
-           * The ID of the associated location.
-           */
-          location_id: string;
-          /**
-           * stocked_quantity
-           * The inventory level's stocked quantity.
-           */
-          stocked_quantity?: number;
-          /**
-           * incoming_quantity
-           * The inventory level's incoming quantity.
-           */
-          incoming_quantity?: number;
-        }[];
-        /** The inventory levels to update. */
-        update?: {
-          /**
-           * stocked_quantity
-           * The inventory level's stocked quantity.
-           */
-          stocked_quantity?: number;
-          /**
-           * incoming_quantity
-           * The inventory level's incoming quantity.
-           */
-          incoming_quantity?: number;
-        }[];
-        /** The inventory levels to delete. */
-        delete?: string[];
-      },
+      data: AdminBatchInventoryItemLocationsLevel,
       params: RequestParams = {},
     ) =>
-      this.request<
-        {
-          /** The inventory item's details. */
-          inventory_item: object;
-        },
-        Error | string
-      >({
+      this.request<any, Error | string>({
         path: `/admin/inventory-items/${id}/location-levels/batch`,
         method: "POST",
         body: data,
         secure: true,
         type: ContentType.Json,
-        format: "json",
         ...params,
       }),
 
@@ -35234,7 +35402,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
            */
           deleted: boolean;
         } & {
-          /** The reservation's inventory item. */
+          /** The inventory item's details. */
           parent?: AdminInventoryItem;
         },
         Error | string
@@ -49676,7 +49844,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description This API route is used by your dashboard or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the frontend. If the decoded data doesn't  have an `actor_id` property, then you must create a user, typically using the Accept Invite route passing the token in the request's Authorization header.
+     * @description This API route is used by your dashboard or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. All query parameters received from the third-party provider, such as `code`, `state`, and `error`, must be passed as query parameters to this route. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the frontend. If the decoded data doesn't  have an `actor_id` property, then you must create a user, typically using the Accept Invite route passing the token in the request's Authorization header.
      *
      * @tags Admin Auth
      * @name AdminPostActorTypeAuthProviderCallback
@@ -49785,7 +49953,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description This API route is used by your storefront or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the storefront. If the decoded data doesn't  have an `actor_id` property, then you must register the customer using the Create Customer API route passing the token in the request's Authorization header.
+     * @description This API route is used by your storefront or frontend application when a third-party provider redirects to it after authentication. It validates the authentication with the third-party provider and, if successful, returns an authentication token. All query parameters received from the third-party provider, such as `code`, `state`, and `error`, must be passed as query parameters to this route. You can decode the JWT token using libraries like [react-jwt](https://www.npmjs.com/package/react-jwt) in the storefront. If the decoded data doesn't  have an `actor_id` property, then you must register the customer using the Create Customer API route passing the token in the request's Authorization header.
      *
      * @tags Store Auth
      * @name StorePostActorTypeAuthProviderCallback
@@ -52046,6 +52214,800 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     ) =>
       this.request<StoreProductCategoryResponse, Error | string>({
         path: `/store/product-categories/${id}`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve a list of product tags. The product tags can be filtered by fields such as `id`. The product tags can also be sorted or paginated.
+     *
+     * @tags Store Product Tags
+     * @name StoreGetProductTags
+     * @summary List Product Tags
+     * @request GET:/store/product-tags
+     */
+    storeGetProductTags: (
+      query?: {
+        /**
+         * fields
+         * Comma-separated fields that should be included in the returned data. If a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default fields. Without prefix it will replace the entire default fields.
+         */
+        fields?: string;
+        /**
+         * offset
+         * The number of items to skip when retrieving a list.
+         */
+        offset?: number;
+        /**
+         * limit
+         * Limit the number of items returned in the list.
+         */
+        limit?: number;
+        /**
+         * order
+         * The field to sort the data by. By default, the sort order is ascending. To change the order to descending, prefix the field name with `-`.
+         */
+        order?: string;
+        /**
+         * $and
+         * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+         */
+        $and?: object[];
+        /**
+         * $or
+         * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+         */
+        $or?: object[];
+        /**
+         * q
+         * Query to search product tag's searchable fields.
+         */
+        q?: string;
+        /** Filter by a product tag's ID. */
+        id?: string | string[];
+        /** Filter by a product tag's value. */
+        value?: string | string[];
+        /** Filter by the tag's creation date. */
+        created_at?: {
+          /**
+           * $and
+           * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+           */
+          $and?: object[];
+          /**
+           * $or
+           * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+           */
+          $or?: object[];
+          /** Filter by an exact match. */
+          $eq?: string | string[];
+          /**
+           * $ne
+           * Filter by values not equal to this parameter.
+           */
+          $ne?: string;
+          /** Filter by values in this array. */
+          $in?: string[];
+          /** Filter by values not in this array. */
+          $nin?: string[];
+          /** Filter by values not matching this parameter. */
+          $not?:
+            | string
+            | {
+                /**
+                 * $and
+                 * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $and?: object[];
+                /**
+                 * $or
+                 * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $or?: object[];
+                /** Filter by an exact match. */
+                $eq?: string | string[];
+                /**
+                 * $ne
+                 * Filter by values not matching this parameter.
+                 */
+                $ne?: string;
+                /** Filter by values in this array. */
+                $in?: string[];
+                /** Filter by values not in this array. */
+                $nin?: string[];
+                /** Filter by values not matching this parameter */
+                $not?: string | object | string[];
+                /**
+                 * $gt
+                 * Filter by values greater than this parameter. Useful for numbers and dates only.
+                 */
+                $gt?: string;
+                /**
+                 * $gte
+                 * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $gte?: string;
+                /**
+                 * $lt
+                 * Filter by values less than this parameter. Useful for numbers and dates only.
+                 */
+                $lt?: string;
+                /**
+                 * $lte
+                 * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $lte?: string;
+                /**
+                 * $like
+                 * Apply a `like` filter. Useful for strings only.
+                 */
+                $like?: string;
+                /**
+                 * $re
+                 * Apply a regex filter. Useful for strings only.
+                 */
+                $re?: string;
+                /**
+                 * $ilike
+                 * Apply a case-insensitive `like` filter. Useful for strings only.
+                 */
+                $ilike?: string;
+                /**
+                 * $fulltext
+                 * Filter to apply on full-text properties.
+                 */
+                $fulltext?: string;
+                /** Filter arrays that have overlapping values with this parameter. */
+                $overlap?: string[];
+                /** Filter arrays that contain some of the values of this parameter. */
+                $contains?: string[];
+                /** Filter arrays that contain all values of this parameter. */
+                $contained?: string[];
+                /**
+                 * $exists
+                 * Filter by whether a value for this parameter exists (not `null`).
+                 */
+                $exists?: boolean;
+              }
+            | string[];
+          /**
+           * $gt
+           * Filter by values greater than this parameter. Useful for numbers and dates only.
+           */
+          $gt?: string;
+          /**
+           * $gte
+           * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $gte?: string;
+          /**
+           * $lt
+           * Filter by values less than this parameter. Useful for numbers and dates only.
+           */
+          $lt?: string;
+          /**
+           * $lte
+           * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $lte?: string;
+          /**
+           * $like
+           * Apply a `like` filter. Useful for strings only.
+           */
+          $like?: string;
+          /**
+           * $re
+           * Apply a regex filter. Useful for strings only.
+           */
+          $re?: string;
+          /**
+           * $ilike
+           * Apply a case-insensitive `like` filter. Useful for strings only.
+           */
+          $ilike?: string;
+          /**
+           * $fulltext
+           * Filter to apply on full-text properties.
+           */
+          $fulltext?: string;
+          /** Filter arrays that have overlapping values with this parameter. */
+          $overlap?: string[];
+          /** Filter arrays that contain some of the values of this parameter. */
+          $contains?: string[];
+          /** Filter arrays that contain all values of this parameter. */
+          $contained?: string[];
+          /**
+           * $exists
+           * Filter by whether a value for this parameter exists (not `null`).
+           */
+          $exists?: boolean;
+        };
+        /** Filter by the tag's update date. */
+        updated_at?: {
+          /**
+           * $and
+           * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+           */
+          $and?: object[];
+          /**
+           * $or
+           * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+           */
+          $or?: object[];
+          /** Filter by an exact match. */
+          $eq?: string | string[];
+          /**
+           * $ne
+           * Filter by values not equal to this parameter.
+           */
+          $ne?: string;
+          /** Filter by values in this array. */
+          $in?: string[];
+          /** Filter by values not in this array. */
+          $nin?: string[];
+          /** Filter by values not matching this parameter. */
+          $not?:
+            | string
+            | {
+                /**
+                 * $and
+                 * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $and?: object[];
+                /**
+                 * $or
+                 * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $or?: object[];
+                /** Filter by an exact match. */
+                $eq?: string | string[];
+                /**
+                 * $ne
+                 * Filter by values not matching this parameter.
+                 */
+                $ne?: string;
+                /** Filter by values in this array. */
+                $in?: string[];
+                /** Filter by values not in this array. */
+                $nin?: string[];
+                /** Filter by values not matching this parameter */
+                $not?: string | object | string[];
+                /**
+                 * $gt
+                 * Filter by values greater than this parameter. Useful for numbers and dates only.
+                 */
+                $gt?: string;
+                /**
+                 * $gte
+                 * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $gte?: string;
+                /**
+                 * $lt
+                 * Filter by values less than this parameter. Useful for numbers and dates only.
+                 */
+                $lt?: string;
+                /**
+                 * $lte
+                 * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $lte?: string;
+                /**
+                 * $like
+                 * Apply a `like` filter. Useful for strings only.
+                 */
+                $like?: string;
+                /**
+                 * $re
+                 * Apply a regex filter. Useful for strings only.
+                 */
+                $re?: string;
+                /**
+                 * $ilike
+                 * Apply a case-insensitive `like` filter. Useful for strings only.
+                 */
+                $ilike?: string;
+                /**
+                 * $fulltext
+                 * Filter to apply on full-text properties.
+                 */
+                $fulltext?: string;
+                /** Filter arrays that have overlapping values with this parameter. */
+                $overlap?: string[];
+                /** Filter arrays that contain some of the values of this parameter. */
+                $contains?: string[];
+                /** Filter arrays that contain all values of this parameter. */
+                $contained?: string[];
+                /**
+                 * $exists
+                 * Filter by whether a value for this parameter exists (not `null`).
+                 */
+                $exists?: boolean;
+              }
+            | string[];
+          /**
+           * $gt
+           * Filter by values greater than this parameter. Useful for numbers and dates only.
+           */
+          $gt?: string;
+          /**
+           * $gte
+           * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $gte?: string;
+          /**
+           * $lt
+           * Filter by values less than this parameter. Useful for numbers and dates only.
+           */
+          $lt?: string;
+          /**
+           * $lte
+           * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $lte?: string;
+          /**
+           * $like
+           * Apply a `like` filter. Useful for strings only.
+           */
+          $like?: string;
+          /**
+           * $re
+           * Apply a regex filter. Useful for strings only.
+           */
+          $re?: string;
+          /**
+           * $ilike
+           * Apply a case-insensitive `like` filter. Useful for strings only.
+           */
+          $ilike?: string;
+          /**
+           * $fulltext
+           * Filter to apply on full-text properties.
+           */
+          $fulltext?: string;
+          /** Filter arrays that have overlapping values with this parameter. */
+          $overlap?: string[];
+          /** Filter arrays that contain some of the values of this parameter. */
+          $contains?: string[];
+          /** Filter arrays that contain all values of this parameter. */
+          $contained?: string[];
+          /**
+           * $exists
+           * Filter by whether a value for this parameter exists (not `null`).
+           */
+          $exists?: boolean;
+        };
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<StoreProductTagListResponse, Error | string>({
+        path: `/store/product-tags`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve a product tag by its ID. You can expand the product tag's relations or select the fields that should be returned.
+     *
+     * @tags Store Product Tags
+     * @name StoreGetProductTagsId
+     * @summary Get a Product Tag
+     * @request GET:/store/product-tags/{id}
+     */
+    storeGetProductTagsId: (
+      id: string,
+      query?: {
+        /**
+         * fields
+         * Comma-separated fields that should be included in the returned data. If a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default fields. Without prefix it will replace the entire default fields.
+         */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<StoreProductTagResponse, Error | string>({
+        path: `/store/product-tags/${id}`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve a list of product types. The product types can be filtered by fields such as `id`. The product types can also be sorted or paginated.
+     *
+     * @tags Store Product Types
+     * @name StoreGetProductTypes
+     * @summary List Product Types
+     * @request GET:/store/product-types
+     */
+    storeGetProductTypes: (
+      query?: {
+        /**
+         * fields
+         * Comma-separated fields that should be included in the returned data. If a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default fields. Without prefix it will replace the entire default fields.
+         */
+        fields?: string;
+        /**
+         * offset
+         * The number of items to skip when retrieving a list.
+         */
+        offset?: number;
+        /**
+         * limit
+         * Limit the number of items returned in the list.
+         */
+        limit?: number;
+        /**
+         * order
+         * The field to sort the data by. By default, the sort order is ascending. To change the order to descending, prefix the field name with `-`.
+         */
+        order?: string;
+        /**
+         * $and
+         * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+         */
+        $and?: object[];
+        /**
+         * $or
+         * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+         */
+        $or?: object[];
+        /**
+         * q
+         * Query to search the product type's searchable fields.
+         */
+        q?: string;
+        /** Filter by a product type's ID. */
+        id?: string | string[];
+        /** Filter by a product type's value. */
+        value?: string | string[];
+        /** Filter by the type's creation date. */
+        created_at?: {
+          /**
+           * $and
+           * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+           */
+          $and?: object[];
+          /**
+           * $or
+           * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+           */
+          $or?: object[];
+          /** Filter by an exact match. */
+          $eq?: string | string[];
+          /**
+           * $ne
+           * Filter by values not equal to this parameter.
+           */
+          $ne?: string;
+          /** Filter by values in this array. */
+          $in?: string[];
+          /** Filter by values not in this array. */
+          $nin?: string[];
+          /** Filter by values not matching this parameter. */
+          $not?:
+            | string
+            | {
+                /**
+                 * $and
+                 * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $and?: object[];
+                /**
+                 * $or
+                 * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $or?: object[];
+                /** Filter by an exact match. */
+                $eq?: string | string[];
+                /**
+                 * $ne
+                 * Filter by values not matching this parameter.
+                 */
+                $ne?: string;
+                /** Filter by values in this array. */
+                $in?: string[];
+                /** Filter by values not in this array. */
+                $nin?: string[];
+                /** Filter by values not matching this parameter */
+                $not?: string | object | string[];
+                /**
+                 * $gt
+                 * Filter by values greater than this parameter. Useful for numbers and dates only.
+                 */
+                $gt?: string;
+                /**
+                 * $gte
+                 * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $gte?: string;
+                /**
+                 * $lt
+                 * Filter by values less than this parameter. Useful for numbers and dates only.
+                 */
+                $lt?: string;
+                /**
+                 * $lte
+                 * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $lte?: string;
+                /**
+                 * $like
+                 * Apply a `like` filter. Useful for strings only.
+                 */
+                $like?: string;
+                /**
+                 * $re
+                 * Apply a regex filter. Useful for strings only.
+                 */
+                $re?: string;
+                /**
+                 * $ilike
+                 * Apply a case-insensitive `like` filter. Useful for strings only.
+                 */
+                $ilike?: string;
+                /**
+                 * $fulltext
+                 * Filter to apply on full-text properties.
+                 */
+                $fulltext?: string;
+                /** Filter arrays that have overlapping values with this parameter. */
+                $overlap?: string[];
+                /** Filter arrays that contain some of the values of this parameter. */
+                $contains?: string[];
+                /** Filter arrays that contain all values of this parameter. */
+                $contained?: string[];
+                /**
+                 * $exists
+                 * Filter by whether a value for this parameter exists (not `null`).
+                 */
+                $exists?: boolean;
+              }
+            | string[];
+          /**
+           * $gt
+           * Filter by values greater than this parameter. Useful for numbers and dates only.
+           */
+          $gt?: string;
+          /**
+           * $gte
+           * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $gte?: string;
+          /**
+           * $lt
+           * Filter by values less than this parameter. Useful for numbers and dates only.
+           */
+          $lt?: string;
+          /**
+           * $lte
+           * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $lte?: string;
+          /**
+           * $like
+           * Apply a `like` filter. Useful for strings only.
+           */
+          $like?: string;
+          /**
+           * $re
+           * Apply a regex filter. Useful for strings only.
+           */
+          $re?: string;
+          /**
+           * $ilike
+           * Apply a case-insensitive `like` filter. Useful for strings only.
+           */
+          $ilike?: string;
+          /**
+           * $fulltext
+           * Filter to apply on full-text properties.
+           */
+          $fulltext?: string;
+          /** Filter arrays that have overlapping values with this parameter. */
+          $overlap?: string[];
+          /** Filter arrays that contain some of the values of this parameter. */
+          $contains?: string[];
+          /** Filter arrays that contain all values of this parameter. */
+          $contained?: string[];
+          /**
+           * $exists
+           * Filter by whether a value for this parameter exists (not `null`).
+           */
+          $exists?: boolean;
+        };
+        /** Filter by the type's update date. */
+        updated_at?: {
+          /**
+           * $and
+           * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+           */
+          $and?: object[];
+          /**
+           * $or
+           * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+           */
+          $or?: object[];
+          /** Filter by an exact match. */
+          $eq?: string | string[];
+          /**
+           * $ne
+           * Filter by values not equal to this parameter.
+           */
+          $ne?: string;
+          /** Filter by values in this array. */
+          $in?: string[];
+          /** Filter by values not in this array. */
+          $nin?: string[];
+          /** Filter by values not matching this parameter. */
+          $not?:
+            | string
+            | {
+                /**
+                 * $and
+                 * Join query parameters with an AND condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $and?: object[];
+                /**
+                 * $or
+                 * Join query parameters with an OR condition. Each object's content is the same type as the expected query parameters.
+                 */
+                $or?: object[];
+                /** Filter by an exact match. */
+                $eq?: string | string[];
+                /**
+                 * $ne
+                 * Filter by values not matching this parameter.
+                 */
+                $ne?: string;
+                /** Filter by values in this array. */
+                $in?: string[];
+                /** Filter by values not in this array. */
+                $nin?: string[];
+                /** Filter by values not matching this parameter */
+                $not?: string | object | string[];
+                /**
+                 * $gt
+                 * Filter by values greater than this parameter. Useful for numbers and dates only.
+                 */
+                $gt?: string;
+                /**
+                 * $gte
+                 * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $gte?: string;
+                /**
+                 * $lt
+                 * Filter by values less than this parameter. Useful for numbers and dates only.
+                 */
+                $lt?: string;
+                /**
+                 * $lte
+                 * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+                 */
+                $lte?: string;
+                /**
+                 * $like
+                 * Apply a `like` filter. Useful for strings only.
+                 */
+                $like?: string;
+                /**
+                 * $re
+                 * Apply a regex filter. Useful for strings only.
+                 */
+                $re?: string;
+                /**
+                 * $ilike
+                 * Apply a case-insensitive `like` filter. Useful for strings only.
+                 */
+                $ilike?: string;
+                /**
+                 * $fulltext
+                 * Filter to apply on full-text properties.
+                 */
+                $fulltext?: string;
+                /** Filter arrays that have overlapping values with this parameter. */
+                $overlap?: string[];
+                /** Filter arrays that contain some of the values of this parameter. */
+                $contains?: string[];
+                /** Filter arrays that contain all values of this parameter. */
+                $contained?: string[];
+                /**
+                 * $exists
+                 * Filter by whether a value for this parameter exists (not `null`).
+                 */
+                $exists?: boolean;
+              }
+            | string[];
+          /**
+           * $gt
+           * Filter by values greater than this parameter. Useful for numbers and dates only.
+           */
+          $gt?: string;
+          /**
+           * $gte
+           * Filter by values greater than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $gte?: string;
+          /**
+           * $lt
+           * Filter by values less than this parameter. Useful for numbers and dates only.
+           */
+          $lt?: string;
+          /**
+           * $lte
+           * Filter by values less than or equal to this parameter. Useful for numbers and dates only.
+           */
+          $lte?: string;
+          /**
+           * $like
+           * Apply a `like` filter. Useful for strings only.
+           */
+          $like?: string;
+          /**
+           * $re
+           * Apply a regex filter. Useful for strings only.
+           */
+          $re?: string;
+          /**
+           * $ilike
+           * Apply a case-insensitive `like` filter. Useful for strings only.
+           */
+          $ilike?: string;
+          /**
+           * $fulltext
+           * Filter to apply on full-text properties.
+           */
+          $fulltext?: string;
+          /** Filter arrays that have overlapping values with this parameter. */
+          $overlap?: string[];
+          /** Filter arrays that contain some of the values of this parameter. */
+          $contains?: string[];
+          /** Filter arrays that contain all values of this parameter. */
+          $contained?: string[];
+          /**
+           * $exists
+           * Filter by whether a value for this parameter exists (not `null`).
+           */
+          $exists?: boolean;
+        };
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<StoreProductTypeListResponse, Error | string>({
+        path: `/store/product-types`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve a product type by its ID. You can expand the product type's relations or select the fields that should be returned.
+     *
+     * @tags Store Product Types
+     * @name StoreGetProductTypesId
+     * @summary Get a Product Type
+     * @request GET:/store/product-types/{id}
+     */
+    storeGetProductTypesId: (
+      id: string,
+      query?: {
+        /**
+         * fields
+         * Comma-separated fields that should be included in the returned data. If a field is prefixed with `+` it will be added to the default fields, using `-` will remove it from the default fields. Without prefix it will replace the entire default fields.
+         */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<StoreProductTypeResponse, Error | string>({
+        path: `/store/product-types/${id}`,
         method: "GET",
         query: query,
         format: "json",

@@ -9088,7 +9088,7 @@ inherits@2, inherits@2.0.4, inherits@^2.0.3, inherits@^2.0.4, inherits@~2.0.3:
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
-inquirer@^8.0.0, inquirer@^8.2.6:
+inquirer@^8.0.0:
   version "8.2.6"
   resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-8.2.6.tgz#733b74888195d8d400a67ac332011b5fae5ea562"
   integrity sha512-M1WuAmb7pn9zdFRtQYk26ZBoY043Sse0wVDdk4Bppr+JOXyQYybdtvK+l9wUibhtjdjvtoiNy8tk+EgsYIUqKg==
@@ -10394,13 +10394,6 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==
-
-mercurjs@^1.0.10:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/mercurjs/-/mercurjs-1.0.10.tgz#f1cb164fb27eda32e662fb10d512887a25172554"
-  integrity sha512-EBDH34sQaAtfFrN2VgFFY0nj9ZrF+ml72JO3tQsT6rKBFrMXS306TDijD0spaERt0KDLOmyoJFWvyBOX4ENOQg==
-  dependencies:
-    inquirer "^8.2.6"
 
 merge-descriptors@1.0.3:
   version "1.0.3"
