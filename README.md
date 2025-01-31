@@ -57,14 +57,23 @@ cd apps/backend
 # Clone .env.template
 cp .env.template .env
 
+# Remember to add the database address variable in the format:
+DATABASE_URL=postgres://postgres:<password>@<host>:<port>/<db_name>
+
+# Add your Stripe API key
+STRIPE_SECRET_API_KEY=YouKeyHere
+
 # Setup database and run migrations
 yarn medusa db:create && yarn medusa db:migrate && yarn run seed
+
+# Go to root folder
+cd ../..
 
 # Generate OpenAPI client
 yarn codegen
 
-# Go to root folder
-cd ../..
+# Build
+yarn build
 
 # Start Mercur
 yarn dev
