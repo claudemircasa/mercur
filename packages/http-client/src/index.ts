@@ -23040,6 +23040,17 @@ export interface WorkflowExecutionContext {
   }[];
 }
 
+/**
+ * Update Order Return Request
+ * A schema for the update of order return request.
+ */
+export interface AdminUpdateOrderReturnRequest {
+  /** Reviewer note. */
+  admin_reviewer_note?: string;
+  /** A status of the request */
+  status?: "refunded" | "withdrawn" | "escalated";
+}
+
 export interface CreateProductOption {
   /** The title of the product option (e.g. "Size", "Color"). */
   title: string;
@@ -23171,6 +23182,106 @@ export interface GeoZoneZip {
   city: string;
   /** The postal code expression for the geo zone. */
   postal_expression: object;
+}
+
+/**
+ * Order return request
+ * A return request object with its properties
+ */
+export interface OrderReturnRequest {
+  /** The unique identifier of the order return request. */
+  id?: string;
+  /** The id of the submitter */
+  customer_id?: string;
+  /** Note from the submitter */
+  customer_note?: string;
+  /** The id of the vendor reviewer */
+  vendor_reviewer_id?: string;
+  /** Note from the vendor reviewer */
+  vendor_reviewer_note?: string;
+  /**
+   * The date with timezone of the vendor review
+   * @format date-time
+   */
+  vendor_reviewer_date?: string;
+  /** The id of the admin reviewer */
+  admin_reviewer_id?: string;
+  /** Note from the admin reviewer */
+  admin_reviewer_note?: string;
+  /**
+   * The date with timezone of the admin review
+   * @format date-time
+   */
+  admin_reviewer_date?: string;
+  /** The line items to return. */
+  line_items?: OrderReturnRequestLineItem[];
+  /**
+   * The date with timezone at which the resource was created.
+   * @format date-time
+   */
+  created_at?: string;
+  /**
+   * The date with timezone at which the resource was last updated.
+   * @format date-time
+   */
+  updated_at?: string;
+}
+
+/**
+ * Line item of the order return request
+ * Line item object with its properties
+ */
+export interface OrderReturnRequestLineItem {
+  /** The unique identifier of the order return request. */
+  id?: string;
+  /** The id of the line item in the order */
+  line_item_id?: string;
+  /** The amount of the items to return */
+  quantity?: number;
+}
+
+export interface ProductCategoryRequest {
+  /** The type of the request */
+  type: "product_category";
+  data: {
+    /** The name of the product category */
+    name?: string;
+    /** The description of the product category */
+    description?: string;
+    /** The id of the parent category */
+    parent_category_id?: string;
+  };
+}
+
+export interface ProductCollectionRequest {
+  /** The type of the request */
+  type: "product_collection";
+  data: {
+    /** The title of the product collection */
+    title?: string;
+  };
+}
+
+export interface ProductRequest {
+  /** The type of the request */
+  type: "product";
+  data: VendorCreateProduct;
+}
+
+/**
+ * Create Order Return Request
+ * A schema for the creation of order return request.
+ */
+export interface StoreCreateOrderReturnRequest {
+  /** ID of the order */
+  order_id?: string;
+  /** Customer note. */
+  customer_note?: string;
+  /** Array of items to return */
+  line_items?: {
+    line_item_id?: string;
+    quantity?: number;
+  }[];
 }
 
 export interface UpdateProductOption {
@@ -23375,6 +23486,11 @@ export interface VendorCreateProduct {
   sales_channels?: {
     id: string;
   }[];
+}
+
+export interface VendorCreateRequest {
+  /** The resource to be created by request */
+  request: ProductRequest | ProductCollectionRequest | ProductCategoryRequest;
 }
 
 export interface VendorCreateSeller {
@@ -25091,6 +25207,37 @@ export interface VendorProductVariant {
 }
 
 /**
+ * Request
+ * A request object
+ */
+export interface VendorRequest {
+  /** The unique identifier of the request. */
+  id?: string;
+  /**
+   * The date with timezone at which the resource was created.
+   * @format date-time
+   */
+  created_at?: string;
+  /**
+   * The date with timezone at which the resource was last updated.
+   * @format date-time
+   */
+  updated_at?: string;
+  /** The type of the request object. */
+  type?: string;
+  /** The request payload. */
+  data?: object;
+  /** A unique id of the submitter */
+  submitter_id?: string;
+  /** A unique id of the reviewer */
+  reviewer_id?: string | null;
+  /** A note provided by the reviewer */
+  reviewer_note?: string | null;
+  /** The status of the request */
+  status?: string;
+}
+
+/**
  * VendorSalesChannel
  * The sales channel's details.
  */
@@ -25451,6 +25598,17 @@ export interface VendorUpdateMember {
   phone?: string | null;
   /** URL to the member's photo. */
   photo?: string | null;
+}
+
+/**
+ * Update Order Return Request
+ * A schema for the update of order return request.
+ */
+export interface VendorUpdateOrderReturnRequest {
+  /** Reviewer note. */
+  vendor_reviewer_note?: string;
+  /** A status of the request */
+  status?: "refunded" | "withdrawn" | "escalated";
 }
 
 export interface VendorUpdateProduct {
@@ -49766,6 +49924,104 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         secure: true,
         ...params,
       }),
+
+    /**
+     * @description Retrieves requests list
+     *
+     * @tags OrderReturnRequest
+     * @name AdminListOrderReturnRequests
+     * @summary List return requests
+     * @request GET:/admin/return-request
+     * @secure
+     */
+    adminListOrderReturnRequests: (
+      query?: {
+        /** The number of items to return. Default 50. */
+        limit?: number;
+        /** The number of items to skip before starting the response. Default 0. */
+        offset?: number;
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          order_return_request?: OrderReturnRequest[];
+          /** The total number of requests */
+          count?: number;
+          /** The number of requests skipped */
+          offset?: number;
+          /** The number of requests per page */
+          limit?: number;
+        },
+        any
+      >({
+        path: `/admin/return-request`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a request by id.
+     *
+     * @tags OrderReturnRequest
+     * @name AdminGetOrderReturnRequestById
+     * @summary Get return request by id
+     * @request GET:/admin/return-request/{id}
+     * @secure
+     */
+    adminGetOrderReturnRequestById: (
+      id: string,
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /** A return request object with its properties */
+          orderReturnRequest?: OrderReturnRequest;
+        },
+        any
+      >({
+        path: `/admin/return-request/${id}`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Updates a request by id.
+     *
+     * @tags OrderReturnRequest
+     * @name AdminUpdateOrderReturnRequestById
+     * @summary Update return request by id
+     * @request POST:/admin/return-request/{id}
+     * @secure
+     */
+    adminUpdateOrderReturnRequestById: (id: string, data: AdminUpdateOrderReturnRequest, params: RequestParams = {}) =>
+      this.request<
+        {
+          /** A return request object with its properties */
+          orderReturnRequest?: OrderReturnRequest;
+        },
+        any
+      >({
+        path: `/admin/return-request/${id}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
   };
   auth = {
     /**
@@ -53844,6 +54100,100 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
+
+    /**
+     * @description Retrieves requests list
+     *
+     * @tags OrderReturnRequest
+     * @name StoreListOrderReturnRequests
+     * @summary List return requests
+     * @request GET:/store/return-request
+     * @secure
+     */
+    storeListOrderReturnRequests: (
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          order_return_request?: OrderReturnRequest[];
+          /** The total number of requests */
+          count?: number;
+          /** The number of requests skipped */
+          offset?: number;
+          /** The number of requests per page */
+          limit?: number;
+        },
+        any
+      >({
+        path: `/store/return-request`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Creates a new order return request for the authenticated customer.
+     *
+     * @tags OrderReturnRequest
+     * @name StoreCreateOrderReturnRequest
+     * @summary Create an order return request
+     * @request POST:/store/return-request
+     * @secure
+     */
+    storeCreateOrderReturnRequest: (data: StoreCreateOrderReturnRequest, params: RequestParams = {}) =>
+      this.request<
+        {
+          /** A return request object with its properties */
+          invite?: OrderReturnRequest;
+        },
+        any
+      >({
+        path: `/store/return-request`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a request by id for the authenticated customer.
+     *
+     * @tags OrderReturnRequest
+     * @name StoreGetOrderReturnRequestById
+     * @summary Get return request by id
+     * @request GET:/store/return-request/{id}
+     * @secure
+     */
+    storeGetOrderReturnRequestById: (
+      id: string,
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /** A return request object with its properties */
+          orderReturnRequest?: OrderReturnRequest;
+        },
+        any
+      >({
+        path: `/store/return-request/${id}`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
   };
   vendor = {
     /**
@@ -54738,7 +55088,199 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
 
     /**
-     * @description Creates a new seller with an initial owner member.
+     * @description Retrieves submited requests list
+     *
+     * @tags Requests
+     * @name VendorListRequests
+     * @summary List requests
+     * @request GET:/vendor/requests
+     * @secure
+     */
+    vendorListRequests: (
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          requests?: VendorRequest[];
+          /** The total number of requests */
+          count?: number;
+          /** The number of requests skipped */
+          offset?: number;
+          /** The number of requests per page */
+          limit?: number;
+        },
+        any
+      >({
+        path: `/vendor/requests`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Creates a request to admin to accept new resource
+     *
+     * @tags Requests
+     * @name VendorCreateRequest
+     * @summary Create a request to admin
+     * @request POST:/vendor/requests
+     * @secure
+     */
+    vendorCreateRequest: (data: VendorCreateRequest, params: RequestParams = {}) =>
+      this.request<
+        {
+          /** A request object */
+          request?: VendorRequest;
+        },
+        any
+      >({
+        path: `/vendor/requests`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a request by id for the authenticated vendor.
+     *
+     * @tags Requests
+     * @name VendorGetRequestById
+     * @summary Get request by id
+     * @request GET:/vendor/requests/{id}
+     * @secure
+     */
+    vendorGetRequestById: (
+      id: string,
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /** A request object */
+          request?: VendorRequest;
+        },
+        any
+      >({
+        path: `/vendor/requests/${id}`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves requests list
+     *
+     * @tags OrderReturnRequest
+     * @name VendorListOrderReturnRequests
+     * @summary List return requests
+     * @request GET:/vendor/return-request
+     * @secure
+     */
+    vendorListOrderReturnRequests: (
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          order_return_request?: OrderReturnRequest[];
+          /** The total number of requests */
+          count?: number;
+          /** The number of requests skipped */
+          offset?: number;
+          /** The number of requests per page */
+          limit?: number;
+        },
+        any
+      >({
+        path: `/vendor/return-request`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieves a request by id for the authenticated vendor.
+     *
+     * @tags OrderReturnRequest
+     * @name VendorGetOrderReturnRequestById
+     * @summary Get return request by id
+     * @request GET:/vendor/return-request/{id}
+     * @secure
+     */
+    vendorGetOrderReturnRequestById: (
+      id: string,
+      query?: {
+        /** Comma-separated fields to include in the response. */
+        fields?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /** A return request object with its properties */
+          orderReturnRequest?: OrderReturnRequest;
+        },
+        any
+      >({
+        path: `/vendor/return-request/${id}`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Updates a request by id for the authenticated vendor.
+     *
+     * @tags OrderReturnRequest
+     * @name VendorUpdateOrderReturnRequestById
+     * @summary Update return request by id
+     * @request POST:/vendor/return-request/{id}
+     * @secure
+     */
+    vendorUpdateOrderReturnRequestById: (
+      id: string,
+      data: VendorUpdateOrderReturnRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /** A return request object with its properties */
+          orderReturnRequest?: OrderReturnRequest;
+        },
+        any
+      >({
+        path: `/vendor/return-request/${id}`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Creates a request to create a new seller with an initial owner member.
      *
      * @tags Seller
      * @name VendorCreateSeller
@@ -54749,8 +55291,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     vendorCreateSeller: (data: VendorCreateSeller, params: RequestParams = {}) =>
       this.request<
         {
-          /** A seller object with its properties */
-          seller?: VendorSeller;
+          /** A request object */
+          request?: VendorRequest;
         },
         any
       >({
