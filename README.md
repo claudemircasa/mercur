@@ -71,8 +71,12 @@ cd ../..
 
 # Generate OpenAPI client
 yarn generate:oas
-yarn codegen
+yarn codegencd
 yarn dev
+
+# Create a new user (Medusa admin panel at http://localhost:9000/app/)
+cd apps/backend
+npx medusa user -e some@email.com -p somepassword
 ```
 
 &nbsp;
